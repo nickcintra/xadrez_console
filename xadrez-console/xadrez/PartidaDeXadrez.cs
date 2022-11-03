@@ -37,7 +37,7 @@ namespace xadrez
             p.incrementarQtdeMovimentos();
             Peca pecaCapturada = tab.retirarPeca(destino);
             tab.colocarPeca(p, destino);
-            if(pecaCapturada != null)
+            if (pecaCapturada != null)
             {
                 capturadas.Add(pecaCapturada);
             }
@@ -68,7 +68,7 @@ namespace xadrez
 
             if (p is Peao)
             {
-                if(origem.coluna != destino.coluna && pecaCapturada == null)
+                if (origem.coluna != destino.coluna && pecaCapturada == null)
                 {
                     Posicao posP;
                     if (p.cor == Cor.Branca)
@@ -122,7 +122,7 @@ namespace xadrez
             // #jogadaespecial en passant
             if (p is Peao)
             {
-                if(origem.coluna != destino.coluna && pecaCapturada == vulneravelEnPassant)
+                if (origem.coluna != destino.coluna && pecaCapturada == vulneravelEnPassant)
                 {
                     Peca peao = tab.retirarPeca(destino);
                     Posicao posP;
@@ -148,7 +148,24 @@ namespace xadrez
                 throw new TabuleiroException("Você não pode se colocar em xeque!");
             }
 
-            if (estaEmXeque(adversaria(jogadorAtual))){
+            Peca p = tab.peca(destino);
+
+            // #jogadaespecial promocao
+            if (p is Peao)
+            {
+                if ((p.cor == Cor.Branca && destino.linha == 0) || (p.cor == Cor.Preta && destino.linha == 7))
+                {
+                    p = tab.retirarPeca(destino);
+                    pecas.Remove(p);
+                    Peca dama = new Dama(tab, p.cor);
+                    tab.colocarPeca(dama, destino);
+                    pecas.Add(dama);
+                }
+            }
+
+
+            if (estaEmXeque(adversaria(jogadorAtual)))
+            {
                 xeque = true;
             }
             else
@@ -166,11 +183,11 @@ namespace xadrez
                 mudaJogador();
             }
 
-            Peca p = tab.peca(destino);
+
 
             // #jogadaespecial en passant
 
-            if (p is Peao && (destino.linha == origem.linha - 2 || destino.linha == origem.linha +2))
+            if (p is Peao && (destino.linha == origem.linha - 2 || destino.linha == origem.linha + 2))
             {
                 vulneravelEnPassant = p;
             }
@@ -178,7 +195,7 @@ namespace xadrez
             {
                 vulneravelEnPassant = null;
             }
-            
+
         }
 
         public void validarPosicaoDeOrigem(Posicao pos)
@@ -195,7 +212,7 @@ namespace xadrez
             {
                 throw new TabuleiroException("Não há movimentos possíveis para a peça de origem escolhida!");
             }
-            
+
         }
 
         public void validarPosicaoDeDestino(Posicao origem, Posicao destino)
@@ -209,7 +226,7 @@ namespace xadrez
 
         private void mudaJogador()
         {
-            if(jogadorAtual == Cor.Branca)
+            if (jogadorAtual == Cor.Branca)
             {
                 jogadorAtual = Cor.Preta;
             }
@@ -224,7 +241,7 @@ namespace xadrez
             HashSet<Peca> aux = new HashSet<Peca>();
             foreach (Peca x in capturadas)
             {
-                if(x.cor == cor)
+                if (x.cor == cor)
                 {
                     aux.Add(x);
                 }
@@ -248,7 +265,7 @@ namespace xadrez
 
         private Cor adversaria(Cor cor)
         {
-            if(cor == Cor.Branca)
+            if (cor == Cor.Branca)
             {
                 return Cor.Preta;
             }
@@ -273,15 +290,15 @@ namespace xadrez
         public bool estaEmXeque(Cor cor)
         {
             Peca R = rei(cor);
-            if(R == null)
+            if (R == null)
             {
                 throw new TabuleiroException("Não tem rei da cor" + cor + " no tabuleiro !");
             }
 
-            foreach (Peca x in pecasEmJogo(adversaria(cor))) 
+            foreach (Peca x in pecasEmJogo(adversaria(cor)))
             {
                 bool[,] mat = x.movimentosPossiveis();
-                if(mat[R.posicao.linha, R.posicao.coluna])
+                if (mat[R.posicao.linha, R.posicao.coluna])
                 {
                     return true;
                 }
@@ -303,7 +320,7 @@ namespace xadrez
                 {
                     for (int j = 0; j < tab.colunas; j++)
                     {
-                        if (mat[i,j])
+                        if (mat[i, j])
                         {
                             Posicao origem = x.posicao;
                             Posicao destino = new Posicao(i, j);
